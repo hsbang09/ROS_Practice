@@ -1,42 +1,23 @@
 
 <launch>
-    <!-- Turtlesim Node-->
+
     <node pkg="turtlesim" type="turtlesim_node" name="sim"/>
-    <node pkg="turtlesim" type="turtle_teleop_key" name="teleop" output="screen"/>
     
-    <node pkg="social_nav" type="turtle_tf_listener.py" name="listener"/>
-    <node pkg="social_nav" type="fixed_tf_broadcaster.py" name="broadcaster_fixed"/>
+    <node pkg="social_nav" type="talker_pedestrians.py" name="talker_pedestrians"/>
     
 
-    <node name="turtle1_tf_broadcaster" pkg="social_nav" type="turtle_tf_broadcaster.py" respawn="false" output="screen" >
+
+    <node name="talker_pedestrians" pkg="social_nav" type="talker_pedestrians.py" respawn="false" output="screen" >
         <param name="turtle" type="string" value="turtle1" />
     </node>
-    
-    <node name="turtle2_tf_broadcaster" pkg="social_nav" type="turtle_tf_broadcaster.py" respawn="false" output="screen" >
+    <node name="talker_pedestrians" pkg="social_nav" type="talker_pedestrians.py" respawn="false" output="screen" >
         <param name="turtle" type="string" value="turtle2" /> 
     </node>
-    
-    
-
-</launch>
-
-
-
-<launch>
-
-
-    <group ns="turtlesim1">
-	   <node pkg="turtlesim" type="turtlesim_node"/>
-       <node pkg="turtlesim" name=""
-    </group>
-
-    <group ns="turtlesim2">
-	   <node pkg="turtlesim" name="sim" type="turtlesim_node"/>
-    </group>
-
-    <node pkg="turtlesim" name="mimic" type="mimic">
-	   <remap from="input" to="turtlesim1/turtle1"/>
-	   <remap from="output" to="turtlesim2/turtle1"/>
+    <node name="talker_pedestrians" pkg="social_nav" type="talker_pedestrians.py" respawn="false" output="screen" >
+        <param name="turtle" type="string" value="turtle3" /> 
+    </node>
+    <node name="talker_pedestrians" pkg="social_nav" type="talker_pedestrians.py" respawn="false" output="screen" >
+        <param name="turtle" type="string" value="turtle4" /> 
     </node>
 
 </launch>
