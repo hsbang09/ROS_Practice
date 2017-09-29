@@ -17,6 +17,7 @@ import numpy as np
 
 NUM_PEDESTRIANS = 7
 
+
 class Turtle():
     
     def __init__(self,name,i,x,y,theta, pedestrian = True, goal=None):
@@ -27,13 +28,14 @@ class Turtle():
         self.pedestrian = pedestrian
         
         self.goal = goal
-        self._goal = np.array([self.goal[0],self.goal[1]]) # Intermediate goal
         
         if self.pedestrian:            
             self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)
-
+            self._goal = np.array([self.goal[0],self.goal[1]]) # Intermediate goal
+            
         else:
             self.velocity_publisher = None
+            self._goal = None
         
         
         self.pose_subscriber = rospy.Subscriber('/turtle{0}/pose'.format(self.id), Pose, self.set_position)
@@ -63,15 +65,16 @@ class Turtle():
             pass
         
         else:
-            self.apply_repulsive_force(objects)
+            #self.apply_repulsive_force(objects)
 
             #angular = 4 * math.atan2(trans[1], trans[0])
             #linear = 0.5 * math.sqrt(trans[0] ** 2 + trans[1] ** 2)
 
             #linear = np.linalg.norm(self._goal) + self.pose.linear_velocity
-            
             #angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
 
+            
+            self.go_to_goal()
             
             linear = np.linalg.norm(self._goal)
             angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
@@ -82,6 +85,26 @@ class Turtle():
 
             self.velocity_publisher.publish(cmd)
     
+    
+    def go_to_goal(self):
+        
+        try:
+
+            # Get distance to the goal
+            distance = self.get_distance(self.goal[0], self.goal[1])
+
+            diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
+
+            if np.linalg.norm(diff)==0:
+                print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
+
+            # Normalize to get direction
+            direction = diff/np.linalg.norm(diff)
+            
+            self._goal = distance * direction
+        
+        except Exception as e:
+            print(e)
     
     
     def apply_repulsive_force(self, objects):
