@@ -17,9 +17,6 @@ import numpy as np
 
 NUM_PEDESTRIANS = 7
 
-PEDESTRIANS = []
-
-
 class Turtle():
     
     def __init__(self,name,i,x,y,theta, pedestrian = True):
@@ -55,23 +52,24 @@ class Turtle():
         return self.pose
     
     
-    def move(self):
-        self.repulsive_force()
+    def move(self, objects):
+        self.repulsive_force(objects)
     
     
-    def repulsive_force(self):
+    def repulsive_force(self, objects):
+        
 
         try:
-            for p in PEDESTRIANS:
+            for o in objects:
                 
-                if p is self:
+                if o is self:
                     # If the pedestrian is itself, pass
                     continue
 
-                p_position = p.get_position()    
+                position = o.get_position()    
                 
                 # Get distance to another pedestrian
-                distance = self.get_distance(p_position.x,p_position.y)
+                distance = self.get_distance(position.x,position.y)
 
                 if not self.pedestrian:
                     # If the current turtle is turtle1, pass
@@ -79,7 +77,7 @@ class Turtle():
 
                 elif distance < 1.5:
 
-                    diff = (np.array([self.pose.x,self.pose.y]) - np.array([p_position.x,p_position.y]))
+                    diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
 
                     if np.linalg.norm(diff)==0:
                         print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
@@ -132,10 +130,10 @@ def simulate_pedestrians():
     rospy.wait_for_service('spawn')
     spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
     
-    PEDESTRIANS = []
+    objects = []
     
     turtle1 = Turtle('turtle1',1,0,0,0,False)
-    PEDESTRIANS.append(turtle1)
+    objects.append(turtle1)
     
     for i in range(NUM_PEDESTRIANS):
         
@@ -147,7 +145,7 @@ def simulate_pedestrians():
         
         name = 'turtle{0}'.format(pid)
         
-        PEDESTRIANS.append(Turtle(name,pid,x,y,theta))
+        objects.append(Turtle(name,pid,x,y,theta))
         spawner(x,y,theta, name)
 
     
@@ -157,7 +155,7 @@ def simulate_pedestrians():
     while not rospy.is_shutdown():
         
         for i in range(NUM_PEDESTRIANS):
-            t = PEDESTRIANS[i]
+            t = objects[i]
             t.move()
 
         #rospy.loginfo()
