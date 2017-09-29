@@ -34,7 +34,7 @@ class Turtle():
             self._goal = np.array([self.goal[0],self.goal[1]]) # Intermediate goal
             
         else:
-            
+            # User-controlled turtle (no publisher, no goal)
             self.velocity_publisher = None
             self._goal = None
         
@@ -93,7 +93,10 @@ class Turtle():
             
             if np.linalg.norm(goal_vector) > 0.05:
                 
-                linear = np.linalg.norm(goal_vector)
+                print(goal_vector)
+                print(math.atan2(goal_vector[1],goal_vector[0]))
+                
+                linear = 0.5*np.linalg.norm(goal_vector)
                 angular = 1*(math.atan2(goal_vector[1], goal_vector[0]) - self.pose.theta)
 
                 cmd = Twist()
@@ -199,13 +202,13 @@ def simulate_pedestrians():
         name = 'turtle{0}'.format(pid)
         
         # Set the initial position
-        init_x = random.random()*2
-        init_y = random.random()*6 + 3        
-        init_theta = random.random()*2*math.pi
+        init_x = random.uniform(0,2)
+        init_y = random.uniform(3,7)   
+        init_theta = random.uniform(-math.pi,math.pi)
         
         # Set the goal position
-        goal_x = random.random()*2+8
-        goal_y = random.random()*10
+        goal_x = random.uniform(9,11)
+        goal_y = random.uniform(0,10)
         goal = np.array([goal_x,goal_y])
         
         objects.append(Turtle(name,pid,init_x,init_y,init_theta,True,goal))
