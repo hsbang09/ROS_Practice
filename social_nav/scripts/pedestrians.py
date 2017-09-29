@@ -74,75 +74,88 @@ class Turtle():
             #angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
 
             
-            self.go_to_goal()
+            #self.go_to_goal()
             
-            linear = np.linalg.norm(self._goal)
-            angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
-            
-            cmd = Twist()
-            cmd.linear.x = linear
-            cmd.angular.z = angular
 
-            self.velocity_publisher.publish(cmd)
+            
+            goal_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
+            
+            if np.linalg.norm(goal_vector) > 0.01:
+                
+                linear = np.linalg.norm(goal_vector)
+                angular = (math.atan2(goal_vector[1], goal_vector[0]) - self.pose.theta)
+
+                cmd = Twist()
+                cmd.linear.x = linear
+                cmd.angular.z = angular
+
+                self.velocity_publisher.publish(cmd)
+                
+                
+                
     
     
     def go_to_goal(self):
-        
-        try:
-
-            # Get distance to the goal
-            distance = self.get_distance(self.goal[0], self.goal[1])
-
-            diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
-
-            if np.linalg.norm(diff)==0:
-                print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
-
-            # Normalize to get direction
-            direction = diff/np.linalg.norm(diff)
-            
-            self._goal = distance * direction
-        
-        except Exception as e:
-            print(e)
-    
+        pass
+#        try:
+#            
+#            diff = (np.array([self.pose.x,self.pose.y]) - np.array([self.goal[0],self.goal[1]]))
+#            
+#            if np.linalg.norm(diff)==0:
+#                print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
+#
+#            # Normalize to get direction
+#            direction_to_goal = diff/np.linalg.norm(diff)
+#            
+#            
+#            # Get distance to the goal
+#            distance_to_goal = self.get_distance(self.goal[0], self.goal[1])
+#
+#
+#
+#            
+#            self._goal = distance2Goal * direction2Goal
+#        
+#        except Exception as e:
+#            print(e)
+#    
     
     def apply_repulsive_force(self, objects):
-
-        try:
-            for o in objects:
-                
-                if o is self:
-                    # If the pedestrian is itself, pass
-                    continue
-
-                # Get the position of the object
-                position = o.get_position()
-                
-                # Get distance to the object
-                distance = self.get_distance(position.x, position.y)
-                
-                if distance < 1:
-                    
-                    diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
-
-                    if np.linalg.norm(diff)==0:
-                        print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
-
-                    # Normalize to get direction
-                    direction = diff/np.linalg.norm(diff)
-                    
-                    # delta_linear_vel = math.exp(-distance)
-                    # self._goal = delta_linear_vel * direction
-                    self._goal = direction
-                    
-                
-                else:
-                    
-                    self._goal = np.array([0,0])
-        
-        except Exception as e:
-            print(e)
+        pass
+#        try:
+#            for o in objects:
+#                
+#                if o is self:
+#                    # If the pedestrian is itself, pass
+#                    continue
+#
+#                # Get the position of the object
+#                position = o.get_position()
+#                
+#                # Get distance to the object
+#                distance = self.get_distance(position.x, position.y)
+#                
+#                if distance < 1:
+#                    
+#                    diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
+#
+#                    if np.linalg.norm(diff)==0:
+#                        print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
+#
+#                    # Normalize to get direction
+#                    direction = diff/np.linalg.norm(diff)
+#                    
+#                    # delta_linear_vel = math.exp(-distance)
+#                    # self._goal = delta_linear_vel * direction
+#                    self._goal = direction
+#                    
+#                
+#                else:
+#                    
+#                    self._goal = np.array([0,0])
+#        
+#        except Exception as e:
+#            print(e)
         
         
         
