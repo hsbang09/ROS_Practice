@@ -19,15 +19,19 @@ NUM_PEDESTRIANS = 7
 
 class Turtle():
     
-    def __init__(self,name,i,x,y,theta, pedestrian = True):
+    def __init__(self,name,i,x,y,theta, pedestrian = True, goal=None):
         
         self.name=name
         self.id=i
-        self.starting_point = {"x":x,"y":y,"theta":theta}
+        self.start = {"x":x,"y":y,"theta":theta}
         self.pedestrian = pedestrian
         
-        if self.pedestrian:
+        self.goal = goal
+        self._goal = {"x":None,"y":None} # Intermediate goal
+        
+        if self.pedestrian:            
             self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)
+
         else:
             self.velocity_publisher = None
         
@@ -53,11 +57,30 @@ class Turtle():
     
     
     def move(self, objects):
-        self.repulsive_force(objects)
-    
-    
-    def repulsive_force(self, objects):
         
+        if not self.pedestrian:
+            # If the current turtle is turtle1, skip moving (turtle1 is user-controlled)
+            pass
+        
+        else:
+            self.apply_repulsive_force(objects)
+
+            #angular = 4 * math.atan2(trans[1], trans[0])
+            #linear = 0.5 * math.sqrt(trans[0] ** 2 + trans[1] ** 2)
+
+            linear = np.linalg.norm(self._goal) + self.pose.linear_velocity
+            
+            angular = (math.atan2(self._goal['y'], self._goal['x']) - self.pose.theta)
+
+            cmd = Twist()
+            cmd.linear.x = linear
+            cmd.angular.z = angular
+
+            self.velocity_publisher.publish(cmd)
+    
+    
+    
+    def apply_repulsive_force(self, objects):
 
         try:
             for o in objects:
@@ -66,41 +89,27 @@ class Turtle():
                     # If the pedestrian is itself, pass
                     continue
 
-                position = o.get_position()    
+                # Get the position of the object
+                position = o.get_position()
                 
-                # Get distance to another pedestrian
-                distance = self.get_distance(position.x,position.y)
-
-                if not self.pedestrian:
-                    # If the current turtle is turtle1, pass
-                    pass
-
-                elif distance < 1.5:
-
+                # Get distance to the object
+                distance = self.get_distance(position.x, position.y)
+                
+                if distance < 1.5:
+                    
                     diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
 
                     if np.linalg.norm(diff)==0:
                         print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
-                    
+
                     # Normalize to get direction
                     direction = diff/np.linalg.norm(diff)
-
                     
-                    acceleration = distance*direction
-
-                    #angular = 4 * math.atan2(trans[1], trans[0])
-                    #linear = 0.5 * math.sqrt(trans[0] ** 2 + trans[1] ** 2)
-
-                    linear = distance
-
-                    angular = (math.atan2(direction[1], direction[0]) - self.pose.theta)
-
-                    cmd = Twist()
-                    cmd.linear.x = linear
-                    cmd.angular.z = angular
-
-                    self.velocity_publisher.publish(cmd)
-        
+                    delta_linear_vel = math.exp(-distance)
+                
+                    self._goal = delta_linear_vel * direction
+                
+                
         
         except Exception as e:
             print(e)
@@ -137,17 +146,21 @@ def simulate_pedestrians():
     
     for i in range(NUM_PEDESTRIANS):
         
-        x = random.random()*3
-        y = random.random()*6 + 3
-        
         pid = i+2
-        theta = random.random()*math.pi
-        
         name = 'turtle{0}'.format(pid)
         
-        objects.append(Turtle(name,pid,x,y,theta))
+        init_x = random.random()*3
+        init_y = random.random()*6 + 3        
+        init_theta = random.random()*math.pi
+        
+        goal_x = random.random()*3+8
+        goal_y = random.random()*10
+        goal = {"x":goal_x,"y":goal_y}
+        
+        objects.append(Turtle(name,pid,init_x,init_y,init_theta,True,goal))
         spawner(x,y,theta, name)
 
+    
     
     rate = rospy.Rate(10) # 10hz
 
@@ -156,7 +169,7 @@ def simulate_pedestrians():
         
         for i in range(NUM_PEDESTRIANS):
             t = objects[i]
-            t.move()
+            t.move(objects)
 
         #rospy.loginfo()
         
