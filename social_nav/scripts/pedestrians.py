@@ -27,7 +27,7 @@ class Turtle():
         self.pedestrian = pedestrian
         
         self.goal = goal
-        self._goal = [] # Intermediate goal
+        self._goal = np.array([self.goal[0],self.goal[1]]) # Intermediate goal
         
         if self.pedestrian:            
             self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)
@@ -68,10 +68,14 @@ class Turtle():
             #angular = 4 * math.atan2(trans[1], trans[0])
             #linear = 0.5 * math.sqrt(trans[0] ** 2 + trans[1] ** 2)
 
-            linear = np.linalg.norm(self._goal) + self.pose.linear_velocity
+            #linear = np.linalg.norm(self._goal) + self.pose.linear_velocity
             
-            angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
+            #angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
 
+            
+            linear = np.linalg.norm(self._goal)
+            angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
+            
             cmd = Twist()
             cmd.linear.x = linear
             cmd.angular.z = angular
@@ -95,7 +99,7 @@ class Turtle():
                 # Get distance to the object
                 distance = self.get_distance(position.x, position.y)
                 
-                if distance < 1.5:
+                if distance < 1:
                     
                     diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
 
@@ -105,11 +109,14 @@ class Turtle():
                     # Normalize to get direction
                     direction = diff/np.linalg.norm(diff)
                     
-                    delta_linear_vel = math.exp(-distance)
+                    # delta_linear_vel = math.exp(-distance)
+                    # self._goal = delta_linear_vel * direction
+                    self._goal = direction
+                    
                 
-                    self._goal = delta_linear_vel * direction
-                
-                
+                else:
+                    
+                    self._goal = np.array([0,0])
         
         except Exception as e:
             print(e)
@@ -160,10 +167,9 @@ def simulate_pedestrians():
         objects.append(Turtle(name,pid,init_x,init_y,init_theta,True,goal))
         spawner(init_x,init_y,init_theta, name)
 
-    
+        
     
     rate = rospy.Rate(10) # 10hz
-
 
     while not rospy.is_shutdown():
         
