@@ -15,7 +15,7 @@ import random
 import math
 import numpy as np
 
-NUM_PEDESTRIANS = 1
+NUM_PEDESTRIANS = 2
 
 
 class Turtle():
@@ -79,12 +79,13 @@ class Turtle():
 
             goal_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
             
-            print(goal_vector)
             
-            if np.linalg.norm(goal_vector) > 0.01:
+            print(self.goal)
+            
+            if np.linalg.norm(goal_vector) > 0.05:
                 
                 linear = np.linalg.norm(goal_vector)
-                angular = (math.atan2(goal_vector[1], goal_vector[0]) - self.pose.theta)
+                angular = 3*(math.atan2(goal_vector[1], goal_vector[0]) - self.pose.theta)
 
                 cmd = Twist()
                 cmd.linear.x = linear
@@ -195,7 +196,7 @@ def simulate_pedestrians():
         
         init_x = random.random()*3
         init_y = random.random()*6 + 3        
-        init_theta = random.random()*math.pi
+        init_theta = random.random()*2*math.pi
         
         goal_x = random.random()*3+7
         goal_y = random.random()*10
