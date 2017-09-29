@@ -57,6 +57,16 @@ class Turtle():
     def get_position(self):
         return self.pose
     
+    def stop(self):
+        cmd = Twist()
+        cmd.linear.x = 0
+        cmd.linear.y = 0
+        cmd.linear.z = 0
+        cmd.angular.x = 0
+        cmd.angular.y = 0
+        cmd.angular.z = 0
+        self.velocity_publisher.publish(cmd)
+    
     
     def move(self, objects):
         
@@ -79,21 +89,26 @@ class Turtle():
 
             goal_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
             
-            
             print(self.goal)
             
             if np.linalg.norm(goal_vector) > 0.05:
                 
                 linear = np.linalg.norm(goal_vector)
-                angular = 3*(math.atan2(goal_vector[1], goal_vector[0]) - self.pose.theta)
+                angular = 1*(math.atan2(goal_vector[1], goal_vector[0]) - self.pose.theta)
 
                 cmd = Twist()
                 cmd.linear.x = linear
+                cmd.linear.y = 0
+                cmd.linear.z = 0
+                cmd.angular.x = 0
+                cmd.angular.y = 0
                 cmd.angular.z = angular
 
                 self.velocity_publisher.publish(cmd)
-                
-                
+            
+            else:
+                self.stop()
+            
                 
     
     
@@ -165,27 +180,16 @@ class Turtle():
         
         
 def simulate_pedestrians():
-    
-#    pubs = []
-    
-#    for i in range(num_pedestrians):
-#        # Create separate publishers for each turtle pedestrian
-#        pub = rospy.Publisher('/turtle{0}/cmd_vel'.format(i), Twist, queue_size=10)
-#        pubs.append(pub)
-    
-    
-    # 1. Generate nodes: publisher and subscriber for each turtle. 
-    # 2. 
-    
+
+    # Initialize node
     rospy.init_node('pedestrians', anonymous=True)
     
-    #listener = tf.TransformListener()
-
     rospy.wait_for_service('spawn')
     spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
     
     objects = []
     
+    # Spawn the first turtle, which is controlled by the user (using arrow key)
     turtle1 = Turtle('turtle1',1,0,0,0,False)
     objects.append(turtle1)
     
@@ -194,11 +198,13 @@ def simulate_pedestrians():
         pid = i+2
         name = 'turtle{0}'.format(pid)
         
-        init_x = random.random()*3
+        # Set the initial position
+        init_x = random.random()*2
         init_y = random.random()*6 + 3        
         init_theta = random.random()*2*math.pi
         
-        goal_x = random.random()*3+7
+        # Set the goal position
+        goal_x = random.random()*2+8
         goal_y = random.random()*10
         goal = np.array([goal_x,goal_y])
         
