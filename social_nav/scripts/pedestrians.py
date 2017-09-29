@@ -17,6 +17,8 @@ import numpy as np
 
 NUM_PEDESTRIANS = 7
 
+PEDESTRIANS = []
+
 
 class Turtle():
     
@@ -52,39 +54,54 @@ class Turtle():
     def get_position(self):
         return self.pose
     
-    def repulsive_force(self,x,y):
-        
+    
+    def move(self):
+        self.repulsive_force()
+    
+    
+    def repulsive_force(self):
+
         try:
-        
-            distance = self.get_distance(x,y)
-            
-            if not self.pedestrian:
-                pass
+            for p in PEDESTRIANS:
+                
+                if p is self:
+                    # If the pedestrian is itself, pass
+                    continue
 
-            elif distance < 1.5:
+                p_position = p.get_position()    
+                
+                # Get distance to another pedestrian
+                distance = self.get_distance(p_position.x,p_position.y)
 
-                diff = (np.array([self.pose.x,self.pose.y]) - np.array([x,y]))
+                if not self.pedestrian:
+                    # If the current turtle is turtle1, pass
+                    pass
 
-                if(np.linalg.norm(diff)==0){
-                    print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
-                }
+                elif distance < 1.5:
 
-                direction = diff/np.linalg.norm(diff)
+                    diff = (np.array([self.pose.x,self.pose.y]) - np.array([p_position.x,p_position.y]))
 
-                acceleration = distance*direction
+                    if np.linalg.norm(diff)==0:
+                        print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
+                    
+                    # Normalize to get direction
+                    direction = diff/np.linalg.norm(diff)
 
-                #angular = 4 * math.atan2(trans[1], trans[0])
-                #linear = 0.5 * math.sqrt(trans[0] ** 2 + trans[1] ** 2)
+                    
+                    acceleration = distance*direction
 
-                linear = distance
+                    #angular = 4 * math.atan2(trans[1], trans[0])
+                    #linear = 0.5 * math.sqrt(trans[0] ** 2 + trans[1] ** 2)
 
-                angular = (math.atan2(direction[1], direction[0]) - self.pose.theta)
+                    linear = distance
 
-                cmd = Twist()
-                cmd.linear.x = linear
-                cmd.angular.z = angular
+                    angular = (math.atan2(direction[1], direction[0]) - self.pose.theta)
 
-                self.velocity_publisher.publish(cmd)
+                    cmd = Twist()
+                    cmd.linear.x = linear
+                    cmd.angular.z = angular
+
+                    self.velocity_publisher.publish(cmd)
         
         
         except Exception as e:
@@ -115,22 +132,22 @@ def simulate_pedestrians():
     rospy.wait_for_service('spawn')
     spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
     
-    turtles = []
+    PEDESTRIANS = []
     
     turtle1 = Turtle('turtle1',1,0,0,0,False)
-    turtles.append(turtle1)
+    PEDESTRIANS.append(turtle1)
     
     for i in range(NUM_PEDESTRIANS):
         
-        x = random.random()*2
-        y = random.random()*4 + 3
+        x = random.random()*3
+        y = random.random()*6 + 3
         
         pid = i+2
         theta = random.random()*math.pi
         
         name = 'turtle{0}'.format(pid)
         
-        turtles.append(Turtle(name,pid,x,y,theta))
+        PEDESTRIANS.append(Turtle(name,pid,x,y,theta))
         spawner(x,y,theta, name)
 
     
@@ -140,15 +157,9 @@ def simulate_pedestrians():
     while not rospy.is_shutdown():
         
         for i in range(NUM_PEDESTRIANS):
-            for j in range(NUM_PEDESTRIANS-(i+1)):
-                j = j + (i+1)
-                
-                thisTurtle = turtles[i]
-                otherTurtle = turtles[j]  
-                    
-                position = otherTurtle.get_position()                
-                thisTurtle.repulsive_force(position.x,position.y)
-                        
+            t = PEDESTRIANS[i]
+            t.move()
+
         #rospy.loginfo()
         
         rate.sleep()
