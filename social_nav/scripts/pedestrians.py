@@ -27,7 +27,7 @@ class Turtle():
         self.pedestrian = pedestrian
         
         self.goal = goal
-        self._goal = {"x":None,"y":None} # Intermediate goal
+        self._goal = [] # Intermediate goal
         
         if self.pedestrian:            
             self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)
@@ -70,7 +70,7 @@ class Turtle():
 
             linear = np.linalg.norm(self._goal) + self.pose.linear_velocity
             
-            angular = (math.atan2(self._goal['y'], self._goal['x']) - self.pose.theta)
+            angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
 
             cmd = Twist()
             cmd.linear.x = linear
@@ -155,10 +155,10 @@ def simulate_pedestrians():
         
         goal_x = random.random()*3+8
         goal_y = random.random()*10
-        goal = {"x":goal_x,"y":goal_y}
+        goal = np.array([goal_x,goal_y])
         
         objects.append(Turtle(name,pid,init_x,init_y,init_theta,True,goal))
-        spawner(x,y,theta, name)
+        spawner(init_x,init_y,init_theta, name)
 
     
     
