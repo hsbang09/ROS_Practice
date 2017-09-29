@@ -15,7 +15,7 @@ import random
 import math
 import numpy as np
 
-NUM_PEDESTRIANS = 7
+NUM_PEDESTRIANS = 1
 
 
 class Turtle():
@@ -26,20 +26,20 @@ class Turtle():
         self.id=i
         self.start = {"x":x,"y":y,"theta":theta}
         self.pedestrian = pedestrian
-        
         self.goal = goal
         
-        if self.pedestrian:            
+        if self.pedestrian:  
+            
             self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)
             self._goal = np.array([self.goal[0],self.goal[1]]) # Intermediate goal
             
         else:
+            
             self.velocity_publisher = None
             self._goal = None
         
         
         self.pose_subscriber = rospy.Subscriber('/turtle{0}/pose'.format(self.id), Pose, self.set_position)
-        
         self.pose = Pose()
         self.rate = rospy.Rate(10) # 10 Hz
     
@@ -77,8 +77,9 @@ class Turtle():
             #self.go_to_goal()
             
 
-            
             goal_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
+            
+            print(goal_vector)
             
             if np.linalg.norm(goal_vector) > 0.01:
                 
@@ -196,7 +197,7 @@ def simulate_pedestrians():
         init_y = random.random()*6 + 3        
         init_theta = random.random()*math.pi
         
-        goal_x = random.random()*3+8
+        goal_x = random.random()*3+7
         goal_y = random.random()*10
         goal = np.array([goal_x,goal_y])
         
