@@ -104,7 +104,7 @@ class Turtle():
             
             F1 = self.apply_acceleration_term()
             F2 = self.apply_attractive_force(self.goal[0],self.goal[1])
-            F3 = self.apply_repulsive_force(objects)/float(2)
+            F3 = self.apply_repulsive_force(objects)
             
             F = F1+F2+F3
 
@@ -190,7 +190,7 @@ class Turtle():
                 if np.linalg.norm(r_ab)==0:
                     print("{0} and {1} have the same position".format(o.name,self.name))
                 
-                f_ab = np.array([r_ab[0],r_ab[1]]) / float(np.linalg.norm(r_ab))
+                f_ab = -np.array([r_ab[0],r_ab[1]]) / float(math.pow(np.linalg.norm(r_ab),3))
 
                 F = F + f_ab
         
