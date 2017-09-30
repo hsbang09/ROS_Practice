@@ -105,7 +105,7 @@ class Turtle():
                     velocity = float(self.max_vel)/np.linalg.norm(velocity) * velocity
                 
                 linear = np.linalg.norm(velocity)
-                angular = 11*(math.atan2(velocity[1], velocity[0]) - self.pose.theta)                
+                angular = 17*(math.atan2(velocity[1], velocity[0]) - self.pose.theta)                
 
                 cmd = Twist()
                 cmd.linear.x = linear
@@ -182,9 +182,14 @@ class Turtle():
                     print("{0} and {1} have the same position".format(o.name,self.name))
                 
                 # Potential: 1/r
+#                f_ab_x = - r_ab[0] / math.pow(np.linalg.norm(r_ab),3)
+#                f_ab_y = - r_ab[0] / math.pow(np.linalg.norm(r_ab),3)
                 
-                f_ab_x = - r_ab[0] / math.pow(np.linalg.norm(r_ab),3)
-                f_ab_y = - r_ab[0] / math.pow(np.linalg.norm(r_ab),3)
+                # Potential: e^(-r)
+                R = np.linalg.norm(r_ab)
+                f_ab_x = - r_ab[0] / (math.exp(R) * R)
+                f_ab_x = - r_ab[0] / (math.exp(R) * R)
+
                 f_ab = - np.array([f_ab_x, f_ab_y])
                 
                 F = F + f_ab
