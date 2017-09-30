@@ -192,9 +192,9 @@ def simulate_pedestrians():
     # Initialize node
     rospy.init_node('pedestrians', anonymous=True)
     
-    rospy.wait_for_service('teleport')
-    teleporter = rospy.ServiceProxy('teleport',turtlesim.srv.TeleportAbsolute)
-    teleporter(0,0,0)
+#    rospy.wait_for_service('teleport')
+#    teleporter = rospy.ServiceProxy('teleport',turtlesim.srv.TeleportAbsolute)
+#    teleporter(0,0,0)
     
     rospy.wait_for_service('spawn')
     spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
@@ -217,8 +217,10 @@ def simulate_pedestrians():
         init_theta = random.uniform(-math.pi,math.pi)
         
         # Set the goal position
-        goal_x = random.uniform(8.5,10)
-        goal_y = random.uniform(0.5,9.5)
+        #goal_x = random.uniform(8.5,10)
+        #goal_y = random.uniform(0.5,9.5)
+        goal_x = 9
+        goal_y = init_y
         goal = np.array([goal_x,goal_y])
         
         objects.append(Turtle(name,pid,init_x,init_y,init_theta,True,goal))
@@ -231,7 +233,7 @@ def simulate_pedestrians():
     while not rospy.is_shutdown():
         
         for i in range(NUM_PEDESTRIANS):
-            t = objects[i+1]
+            t = objects[i+2]
             t.move(objects)
 
         #rospy.loginfo()
