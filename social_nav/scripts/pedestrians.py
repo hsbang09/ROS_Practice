@@ -176,6 +176,7 @@ class Turtle():
                 r_a = np.array([self.pose.x,self.pose.y])
                 r_ab = r_a - r_b
 
+                
                 if np.linalg.norm(r_ab)==0:
                     print("{0} and {1} have the same position".format(o.name,self.name))
                 
@@ -185,8 +186,8 @@ class Turtle():
                 
                 # Potential: e^(-r)
                 R = np.linalg.norm(r_ab)
-                f_ab_x = - r_ab[0] / float(math.exp(R) * R)
-                f_ab_y = - r_ab[1] / float(math.exp(R) * R)
+                f_ab_x = - r_ab[0] / float(0.5 * math.exp(R/float(0.5)) * R)
+                f_ab_y = - r_ab[1] / float(0.5 * math.exp(R/float(0.5)) * R)
                 f_ab = - np.array([f_ab_x, f_ab_y])
                 F = F + f_ab
         
