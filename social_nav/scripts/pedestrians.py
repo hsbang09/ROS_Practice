@@ -17,7 +17,7 @@ import numpy as np
 
 NUM_PEDESTRIANS = 2
 RATE = 10    # 10Hz
-PERIOD = 1/RATE
+PERIOD = float(1)/RATE
 
 class Turtle():
     
@@ -35,7 +35,7 @@ class Turtle():
         self.desired_vel = 1.5 + random.uniform(-0.5,0.5)
         self.relaxation_time = 1
         
-        self.mass = 1
+        self.mass = 0.5
         self.goal = goal
         
         
@@ -99,20 +99,21 @@ class Turtle():
             
             position_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
             
-            F1 = apply_acceleration_term()
-            F2 = apply_attractive_force()
+            F1 = self.apply_acceleration_term()
+            F2 = self.apply_attractive_force(self.goal[0],self.goal[1])
             
             F = F1+F2
 
             if np.linalg.norm(position_vector) > 0.05:
                 
-                acceleration = F/self.mass
+                acceleration = F/float(self.mass)
                 theta = self.pose.theta
                 speed = self.pose.linear_velocity
+                                
                 velocity = np.array([speed*math.cos(theta),speed*math.sin(theta)]) + PERIOD * acceleration
 
                 if np.linalg.norm(velocity) > self.max_vel:
-                    velocity = self.max_vel/np.linalg.norm(velocity) * velocity
+                    velocity = float(self.max_vel)/np.linalg.norm(velocity) * velocity
                 
                 linear = np.linalg.norm(velocity)
                 angular = 8*(math.atan2(velocity[1], velocity[0]) - self.pose.theta)                
@@ -148,7 +149,7 @@ class Turtle():
         
         current_velocity = np.array([speed*math.cos(theta),speed*math.sin(theta)])
         
-        F_a = 1/self.relaxation_time * (desired_velocity - current_velocity)
+        F_a = float(1)/self.relaxation_time * (desired_velocity - current_velocity)
         
         return F_a
         
@@ -159,7 +160,7 @@ class Turtle():
         r_a = np.array([self.pose.x,self.pose.y])
         r_ai = r_a - r_i
         
-        f_ai = - np.array([r_ai[0],r_ai[1]]) / abs(r_ai)
+        f_ai = - np.array([r_ai[0],r_ai[1]]) / np.linalg.norm(r_ai)
         
         return f_ai
             
