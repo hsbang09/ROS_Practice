@@ -38,7 +38,7 @@ class Turtle():
         self.desired_vel = 1 + random.uniform(-0.5,0.5)
         self.relaxation_time = 1.5
         
-        self.mass = 0.7
+        self.mass = 1.4
         self.goal = goal
         
         
@@ -104,7 +104,7 @@ class Turtle():
             
             F1 = self.apply_acceleration_term()
             F2 = self.apply_attractive_force(self.goal[0],self.goal[1])
-            F3 = self.apply_repulsive_force(objects)
+            F3 = self.apply_repulsive_force(objects)/float(2)
             
             F = F1+F2+F3
 
@@ -187,17 +187,18 @@ class Turtle():
                 r_a = np.array([self.pose.x,self.pose.y])
                 r_ab = r_a - r_b
 
-                f_ab = np.array([r_ab[0],r_ab[1]]) / np.linalg.norm(r_ab)
+                if np.linalg.norm(r_ab)==0:
+                    print("{0} and {1} have the same position".format(o.name,self.name))
+                
+                f_ab = np.array([r_ab[0],r_ab[1]]) / float(np.linalg.norm(r_ab))
 
                 F = F + f_ab
-            
-        return F    
         
         except Exception as e:
             print(e)
         
         
-        
+        return F
         
         
         
