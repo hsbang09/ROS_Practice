@@ -192,8 +192,13 @@ def simulate_pedestrians():
     # Initialize node
     rospy.init_node('pedestrians', anonymous=True)
     
+    rospy.wait_for_service('teleport')
+    teleporter = rospy.ServiceProxy('teleport',turtlesim.srv.TeleportAbsolute)
+    teleporter(0,0,0)
+    
     rospy.wait_for_service('spawn')
     spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
+    
     
     objects = []
     
