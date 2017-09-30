@@ -150,7 +150,7 @@ class Turtle():
         r_ai = r_a - r_i
                 
         # Potential: e^r
-        R = np.linalg.norm(r_ab)
+        R = np.linalg.norm(r_ai)
         f_ai_x = r_ai[0] * math.exp(R) / R
         f_ai_y = r_ai[1] * math.exp(R) / R
         f_ai = - np.array([f_ai_x, f_ai_y])
