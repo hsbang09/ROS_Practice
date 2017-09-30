@@ -149,7 +149,13 @@ class Turtle():
         r_a = np.array([self.pose.x,self.pose.y])
         r_ai = r_a - r_i
         
-        f_ai = - np.array([r_ai[0],r_ai[1]]) / np.linalg.norm(r_ai)
+        #f_ai = - np.array([r_ai[0],r_ai[1]]) / np.linalg.norm(r_ai)
+        
+        # Potential: e^r
+        
+        f_ai_x = r_ai[0] * math.exp(np.linalg.norm(r_ai)) / np.linalg.norm(r_ai)
+        f_ai_y = r_ai[1] * math.exp(np.linalg.norm(r_ai)) / np.linalg.norm(r_ai)
+        f_ai = - np.array([f_ai_x, f_ai_y])
         
         return f_ai
             
@@ -175,8 +181,12 @@ class Turtle():
                 if np.linalg.norm(r_ab)==0:
                     print("{0} and {1} have the same position".format(o.name,self.name))
                 
-                f_ab = np.array([r_ab[0],r_ab[1]]) / float(math.pow(np.linalg.norm(r_ab),3))
-
+                # Potential: 1/r
+                
+                f_ab_x = - r_ab[0] / math.pow(np.linalg.norm(r_ab),3)
+                f_ab_y = - r_ab[0] / math.pow(np.linalg.norm(r_ab),3)
+                f_ab = - np.array([f_ab_x, f_ab_y])
+                
                 F = F + f_ab
         
         except Exception as e:
