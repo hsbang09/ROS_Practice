@@ -16,7 +16,8 @@ import math
 import numpy as np
 
 NUM_PEDESTRIANS = 2
-
+RATE = 10    # 10Hz
+PERIOD = 1/RATE
 
 class Turtle():
     
@@ -26,22 +27,27 @@ class Turtle():
         self.id=i
         self.start = {"x":x,"y":y,"theta":theta}
         self.pedestrian = pedestrian
+        
+        # Maximum velocity
+        self.max_vel = 3
+        
+        # Acceleration term
+        self.desired_vel = 1.5 + random.uniform(-0.5,0.5)
+        self.relaxation_time = 1
+        
+        self.mass = 1
         self.goal = goal
         
+        
         if self.pedestrian:  
-            
-            self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)
-            self._goal = np.array([self.goal[0],self.goal[1]]) # Intermediate goal
-            
+            self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)            
         else:
-            # User-controlled turtle (no publisher, no goal)
+            # User-controlled turtle (no publisher)
             self.velocity_publisher = None
-            self._goal = None
         
         
         self.pose_subscriber = rospy.Subscriber('/turtle{0}/pose'.format(self.id), Pose, self.set_position)
         self.pose = Pose()
-        self.rate = rospy.Rate(10) # 10 Hz
     
     
     def set_position(self, data):
@@ -75,6 +81,8 @@ class Turtle():
             pass
         
         else:
+
+
             #self.apply_repulsive_force(objects)
 
             #angular = 4 * math.atan2(trans[1], trans[0])
@@ -82,22 +90,32 @@ class Turtle():
 
             #linear = np.linalg.norm(self._goal) + self.pose.linear_velocity
             #angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
-
-            
             #self.go_to_goal()
             
+            
+            # Calculate all forces
+            
+            
+            
+            position_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
+            
+            F1 = apply_acceleration_term()
+            F2 = apply_attractive_force()
+            
+            F = F1+F2
 
-            goal_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
-            
-            print(self.goal)
-            
-            if np.linalg.norm(goal_vector) > 0.05:
+            if np.linalg.norm(position_vector) > 0.05:
                 
-                print(goal_vector)
-                print(math.atan2(goal_vector[1],goal_vector[0]))
+                acceleration = F/self.mass
+                theta = self.pose.theta
+                speed = self.pose.linear_velocity
+                velocity = np.array([speed*math.cos(theta),speed*math.sin(theta)]) + PERIOD * acceleration
+
+                if np.linalg.norm(velocity) > self.max_vel:
+                    velocity = self.max_vel/np.linalg.norm(velocity) * velocity
                 
-                linear = 0.5*np.linalg.norm(goal_vector)
-                angular = 1*(math.atan2(goal_vector[1], goal_vector[0]) - self.pose.theta)
+                linear = np.linalg.norm(velocity)
+                angular = 8*(math.atan2(velocity[1], velocity[0]) - self.pose.theta)                
 
                 cmd = Twist()
                 cmd.linear.x = linear
@@ -113,32 +131,42 @@ class Turtle():
                 self.stop()
             
                 
-    
-    
-    def go_to_goal(self):
-        pass
-#        try:
-#            
-#            diff = (np.array([self.pose.x,self.pose.y]) - np.array([self.goal[0],self.goal[1]]))
-#            
-#            if np.linalg.norm(diff)==0:
-#                print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
-#
-#            # Normalize to get direction
-#            direction_to_goal = diff/np.linalg.norm(diff)
-#            
-#            
-#            # Get distance to the goal
-#            distance_to_goal = self.get_distance(self.goal[0], self.goal[1])
-#
-#
-#
-#            
-#            self._goal = distance2Goal * direction2Goal
-#        
-#        except Exception as e:
-#            print(e)
-#    
+        
+        
+    def apply_acceleration_term(self):
+        
+        # Desired direction
+        e_a = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
+        
+        # Desired speed
+        v0_a = self.desired_vel
+        
+        desired_velocity = v0_a * e_a
+        
+        theta = self.pose.theta
+        speed = self.pose.linear_velocity
+        
+        current_velocity = np.array([speed*math.cos(theta),speed*math.sin(theta)])
+        
+        F_a = 1/self.relaxation_time * (desired_velocity - current_velocity)
+        
+        return F_a
+        
+        
+    def apply_attractive_force(self, att_x, att_y):
+
+        r_i = np.array([att_x,att_y])
+        r_a = np.array([self.pose.x,self.pose.y])
+        r_ai = r_a - r_i
+        
+        f_ai = - np.array([r_ai[0],r_ai[1]]) / abs(r_ai)
+        
+        return f_ai
+            
+        
+
+            
+            
     
     def apply_repulsive_force(self, objects):
         pass
@@ -216,12 +244,12 @@ def simulate_pedestrians():
 
         
     
-    rate = rospy.Rate(10) # 10hz
+    rate = rospy.Rate(RATE) # 10hz
 
     while not rospy.is_shutdown():
         
         for i in range(NUM_PEDESTRIANS):
-            t = objects[i]
+            t = objects[i+1]
             t.move(objects)
 
         #rospy.loginfo()
