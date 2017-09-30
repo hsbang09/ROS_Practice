@@ -19,6 +19,9 @@ NUM_PEDESTRIANS = 2
 RATE = 10    # 10Hz
 PERIOD = float(1)/RATE
 
+
+
+
 class Turtle():
     
     def __init__(self,name,i,x,y,theta, pedestrian = True, goal=None):
@@ -29,13 +32,13 @@ class Turtle():
         self.pedestrian = pedestrian
         
         # Maximum velocity
-        self.max_vel = 3
+        self.max_vel = 2
         
         # Acceleration term
-        self.desired_vel = 1.5 + random.uniform(-0.5,0.5)
-        self.relaxation_time = 1
+        self.desired_vel = 1 + random.uniform(-0.5,0.5)
+        self.relaxation_time = 1.5
         
-        self.mass = 0.5
+        self.mass = 0.7
         self.goal = goal
         
         
@@ -101,10 +104,11 @@ class Turtle():
             
             F1 = self.apply_acceleration_term()
             F2 = self.apply_attractive_force(self.goal[0],self.goal[1])
+            F3 = self.apply_repulsive_force(objects)
             
-            F = F1+F2
+            F = F1+F2+F3
 
-            if np.linalg.norm(position_vector) > 0.05:
+            if np.linalg.norm(position_vector) > 0.1:
                 
                 acceleration = F/float(self.mass)
                 theta = self.pose.theta
@@ -116,7 +120,7 @@ class Turtle():
                     velocity = float(self.max_vel)/np.linalg.norm(velocity) * velocity
                 
                 linear = np.linalg.norm(velocity)
-                angular = 8*(math.atan2(velocity[1], velocity[0]) - self.pose.theta)                
+                angular = 11*(math.atan2(velocity[1], velocity[0]) - self.pose.theta)                
 
                 cmd = Twist()
                 cmd.linear.x = linear
@@ -164,47 +168,33 @@ class Turtle():
         
         return f_ai
             
-        
 
-            
-            
-    
     def apply_repulsive_force(self, objects):
-        pass
-#        try:
-#            for o in objects:
-#                
-#                if o is self:
-#                    # If the pedestrian is itself, pass
-#                    continue
-#
-#                # Get the position of the object
-#                position = o.get_position()
-#                
-#                # Get distance to the object
-#                distance = self.get_distance(position.x, position.y)
-#                
-#                if distance < 1:
-#                    
-#                    diff = (np.array([self.pose.x,self.pose.y]) - np.array([position.x,position.y]))
-#
-#                    if np.linalg.norm(diff)==0:
-#                        print("{0} position: {1},{2}. diff: {3}".format(self.name,self.pose.x,self.pose.y,diff))
-#
-#                    # Normalize to get direction
-#                    direction = diff/np.linalg.norm(diff)
-#                    
-#                    # delta_linear_vel = math.exp(-distance)
-#                    # self._goal = delta_linear_vel * direction
-#                    self._goal = direction
-#                    
-#                
-#                else:
-#                    
-#                    self._goal = np.array([0,0])
-#        
-#        except Exception as e:
-#            print(e)
+        
+        F = np.array([0,0])
+            
+        try:
+            for o in objects:
+                
+                if o is self:
+                    # If the pedestrian is itself, pass
+                    continue
+
+                # Get the position of the object
+                position = o.get_position()
+                
+                r_b = np.array([position.x,position.y])
+                r_a = np.array([self.pose.x,self.pose.y])
+                r_ab = r_a - r_b
+
+                f_ab = np.array([r_ab[0],r_ab[1]]) / np.linalg.norm(r_ab)
+
+                F = F + f_ab
+            
+        return F    
+        
+        except Exception as e:
+            print(e)
         
         
         
