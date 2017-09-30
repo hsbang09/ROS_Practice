@@ -38,7 +38,7 @@ class Turtle():
         self.desired_vel = 1 + random.uniform(-0.5,0.5)
         self.relaxation_time = 1.5
         
-        self.mass = 1.4
+        self.mass = 8
         self.goal = goal
         
         
@@ -85,21 +85,6 @@ class Turtle():
         
         else:
 
-
-            #self.apply_repulsive_force(objects)
-
-            #angular = 4 * math.atan2(trans[1], trans[0])
-            #linear = 0.5 * math.sqrt(trans[0] ** 2 + trans[1] ** 2)
-
-            #linear = np.linalg.norm(self._goal) + self.pose.linear_velocity
-            #angular = (math.atan2(self._goal[1], self._goal[0]) - self.pose.theta)
-            #self.go_to_goal()
-            
-            
-            # Calculate all forces
-            
-            
-            
             position_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
             
             F1 = self.apply_acceleration_term()
@@ -190,7 +175,7 @@ class Turtle():
                 if np.linalg.norm(r_ab)==0:
                     print("{0} and {1} have the same position".format(o.name,self.name))
                 
-                f_ab = -np.array([r_ab[0],r_ab[1]]) / float(math.pow(np.linalg.norm(r_ab),3))
+                f_ab = np.array([r_ab[0],r_ab[1]]) / float(math.pow(np.linalg.norm(r_ab),3))
 
                 F = F + f_ab
         
@@ -227,8 +212,8 @@ def simulate_pedestrians():
         init_theta = random.uniform(-math.pi,math.pi)
         
         # Set the goal position
-        goal_x = random.uniform(9,11)
-        goal_y = random.uniform(0,10)
+        goal_x = random.uniform(8.5,10)
+        goal_y = random.uniform(0.5,9.5)
         goal = np.array([goal_x,goal_y])
         
         objects.append(Turtle(name,pid,init_x,init_y,init_theta,True,goal))
