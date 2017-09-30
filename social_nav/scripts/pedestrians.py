@@ -232,8 +232,8 @@ def simulate_pedestrians():
 
     while not rospy.is_shutdown():
         
-        for i in range(NUM_PEDESTRIANS):
-            t = objects[i+2]
+        for i in range(len(objects)):
+            t = objects[i]
             t.move(objects)
 
         #rospy.loginfo()
