@@ -85,7 +85,7 @@ class Turtle():
         
         else:
 
-            position_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
+            goal_vector = np.array([self.goal[0],self.goal[1]]) - np.array([self.pose.x,self.pose.y])
             
             F1 = self.apply_acceleration_term()
             F2 = self.apply_attractive_force(self.goal[0],self.goal[1])
@@ -93,7 +93,7 @@ class Turtle():
             
             F = F1+F2+F3
 
-            if np.linalg.norm(position_vector) > 0.1:
+            if np.linalg.norm(goal_vector) > 0.5:
                 
                 acceleration = F/float(self.mass)
                 theta = self.pose.theta
@@ -148,13 +148,11 @@ class Turtle():
         r_i = np.array([att_x,att_y])
         r_a = np.array([self.pose.x,self.pose.y])
         r_ai = r_a - r_i
-        
-        #f_ai = - np.array([r_ai[0],r_ai[1]]) / np.linalg.norm(r_ai)
-        
+                
         # Potential: e^r
-        
-        f_ai_x = r_ai[0] * math.exp(np.linalg.norm(r_ai)) / np.linalg.norm(r_ai)
-        f_ai_y = r_ai[1] * math.exp(np.linalg.norm(r_ai)) / np.linalg.norm(r_ai)
+        R = np.linalg.norm(r_ab)
+        f_ai_x = r_ai[0] * math.exp(R) / R
+        f_ai_y = r_ai[1] * math.exp(R) / R
         f_ai = - np.array([f_ai_x, f_ai_y])
         
         return f_ai
@@ -187,11 +185,9 @@ class Turtle():
                 
                 # Potential: e^(-r)
                 R = np.linalg.norm(r_ab)
-                f_ab_x = - r_ab[0] / (math.exp(R) * R)
-                f_ab_x = - r_ab[0] / (math.exp(R) * R)
-
+                f_ab_x = - r_ab[0] / float(math.exp(R) * R)
+                f_ab_y = - r_ab[1] / float(math.exp(R) * R)
                 f_ab = - np.array([f_ab_x, f_ab_y])
-                
                 F = F + f_ab
         
         except Exception as e:
@@ -206,10 +202,6 @@ def simulate_pedestrians():
 
     # Initialize node
     rospy.init_node('pedestrians', anonymous=True)
-    
-#    rospy.wait_for_service('teleport')
-#    teleporter = rospy.ServiceProxy('teleport',turtlesim.srv.TeleportAbsolute)
-#    teleporter(0,0,0)
     
     rospy.wait_for_service('spawn')
     spawner = rospy.ServiceProxy('spawn', turtlesim.srv.Spawn)
@@ -227,15 +219,15 @@ def simulate_pedestrians():
         name = 'turtle{0}'.format(pid)
         
         # Set the initial position
-        init_x = random.uniform(0,2)
-        init_y = random.uniform(3,7)   
-        init_theta = random.uniform(-math.pi,math.pi)
+        init_x = random.uniform(0,1)
+        init_y = random.uniform(1,9)   
+        init_theta = random.uniform(-math.pi/2,math.pi/2)
         
         # Set the goal position
-        #goal_x = random.uniform(8.5,10)
-        #goal_y = random.uniform(0.5,9.5)
+        #goal_x = random.uniform(9,10)
+        goal_y = random.uniform(1,9)
         goal_x = 9
-        goal_y = init_y
+        #goal_y = init_y
         goal = np.array([goal_x,goal_y])
         
         objects.append(Turtle(name,pid,init_x,init_y,init_theta,True,goal))
@@ -250,8 +242,6 @@ def simulate_pedestrians():
         for i in range(len(objects)):
             t = objects[i]
             t.move(objects)
-
-        #rospy.loginfo()
         
         rate.sleep()
 
