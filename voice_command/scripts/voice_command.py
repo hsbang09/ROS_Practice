@@ -92,9 +92,7 @@ class Turtle():
             
                 
     def process_command(self, data):
-        
-        print(data)
-        
+                
         command = data.keyphrase
         
         print('{0} received command: {1}'.format(self.name,command))
@@ -112,8 +110,8 @@ class Turtle():
             self.move_to_goal(BOTTOM_RIGHT_CORNER)
             
         else:
-            raise ValueError('I cannot understand the command!')
-        
+            #raise ValueError('I cannot understand the command!')
+            print('I cannot understand the command!')
         
 def run_voice_command():
 
