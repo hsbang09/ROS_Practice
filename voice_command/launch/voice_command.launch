@@ -1,0 +1,8 @@
+<launch>
+
+    <node pkg="turtlesim" type="turtlesim_node" name="sim"/>
+    
+    <node pkg="voice_command" type="voice_command.py" name="voice_control" output="screen"/>
+    
+
+</launch>
