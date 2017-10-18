@@ -97,16 +97,16 @@ class Turtle():
         
         print('{0} received command: {1}'.format(self.name,command))
        
-        if command == "GO TO TOP RIGHT CORNER":
+        if command == "GO TOP RIGHT":
             self.move_to_goal(TOP_RIGHT_CORNER)
         
-        elif command == "GO TO TOP LEFT CORNER":            
+        elif command == "GO TOP LEFT":            
             self.move_to_goal(TOP_LEFT_CORNER)
             
-        elif command == "GO TO BOTTOM LEFT CORNER":
+        elif command == "GO BOTTOM LEFT":
             self.move_to_goal(BOTTOM_LEFT_CORNER)
         
-        elif command == "GO TO BOTTOM RIGHT CORNER":
+        elif command == "GO TOP RIGHT":
             self.move_to_goal(BOTTOM_RIGHT_CORNER)
             
         else:
