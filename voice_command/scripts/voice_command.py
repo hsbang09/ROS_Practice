@@ -93,6 +93,8 @@ class Turtle():
                 
     def process_command(self, data):
         
+        print(data)
+        
         command = data.keyphrase
         
         print('{0} received command: {1}'.format(self.name,command))
@@ -117,8 +119,9 @@ def run_voice_command():
 
     # Initialize node
     rospy.init_node('voice_command', anonymous=True)
-    rospy.wait_for_service('spawn')
+    #rospy.wait_for_service('spawn')
         
+    print('Initiating the voice command')
 
     # Spawn the first turtle, which is controlled by the user (using arrow key)
     turtle1 = Turtle('turtle1',1)
@@ -126,6 +129,7 @@ def run_voice_command():
     rate = rospy.Rate(RATE) # 10hz
 
     while not rospy.is_shutdown():
+        
         
 #        self.velocity_publisher = rospy.Publisher('/turtle{0}/cmd_vel'.format(self.id), Twist, queue_size=10)            
         command_subscriber = rospy.Subscriber('/hlpr_speech_commands', StampedString, turtle1.process_command)
