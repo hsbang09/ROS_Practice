@@ -15,7 +15,7 @@ import random
 import math
 import numpy as np
 
-NUM_PEDESTRIANS = 2
+NUM_PEDESTRIANS = 7
 RATE = 10    # 10Hz
 PERIOD = float(1)/RATE
 
@@ -89,7 +89,7 @@ class Turtle():
             
             F1 = self.apply_acceleration_term()
             F2 = self.apply_attractive_force(self.goal[0],self.goal[1])
-            F3 = self.apply_repulsive_force(objects)
+            F3 = self.apply_repulsive_force(objects)*30
             
             F = F1+F2+F3
 
@@ -151,8 +151,8 @@ class Turtle():
                 
         # Potential: e^r
         R = np.linalg.norm(r_ai)
-        f_ai_x = r_ai[0] * math.exp(R) / R
-        f_ai_y = r_ai[1] * math.exp(R) / R
+        f_ai_x = r_ai[0] * 2*math.exp(2*R) / R
+        f_ai_y = r_ai[1] * 2*math.exp(2*R) / R
         f_ai = - np.array([f_ai_x, f_ai_y])
         
         return f_ai
@@ -186,8 +186,8 @@ class Turtle():
                 
                 # Potential: e^(-r)
                 R = np.linalg.norm(r_ab)
-                f_ab_x = - r_ab[0] / float(0.5 * math.exp(R/float(0.5)) * R)
-                f_ab_y = - r_ab[1] / float(0.5 * math.exp(R/float(0.5)) * R)
+                f_ab_x = - r_ab[0] / float(1 * math.exp(R/float(1)) * R)
+                f_ab_y = - r_ab[1] / float(1 * math.exp(R/float(1)) * R)
                 f_ab = - np.array([f_ab_x, f_ab_y])
                 F = F + f_ab
         
@@ -226,7 +226,7 @@ def simulate_pedestrians():
         
         # Set the goal position
         #goal_x = random.uniform(9,10)
-        goal_y = random.uniform(1,9)
+        goal_y = i+1
         goal_x = 9
         #goal_y = init_y
         goal = np.array([goal_x,goal_y])
