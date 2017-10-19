@@ -97,16 +97,16 @@ class Turtle():
         
         print('{0} received command: {1}'.format(self.name,command))
        
-        if command == "TOP RIGHT":
+        if command == "TWO":
             self.move_to_goal(TOP_RIGHT_CORNER)
         
-        elif command == "TOP LEFT":            
+        elif command == "SEVENTEEN":            
             self.move_to_goal(TOP_LEFT_CORNER)
             
-        elif command == "BOTTOM LEFT":
+        elif command == "SPIDER":
             self.move_to_goal(BOTTOM_LEFT_CORNER)
         
-        elif command == "BOTTOM RIGHT":
+        elif command == "MOVE RIGHT":
             self.move_to_goal(BOTTOM_RIGHT_CORNER)
         
         elif command == "CENTER":
