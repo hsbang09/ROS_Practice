@@ -106,7 +106,7 @@ class Turtle():
         elif command == "BOTTOM LEFT":
             self.move_to_goal(BOTTOM_LEFT_CORNER)
         
-        elif command == "TOP RIGHT":
+        elif command == "BOTTOM RIGHT":
             self.move_to_goal(BOTTOM_RIGHT_CORNER)
         
         elif command == "CENTER":
