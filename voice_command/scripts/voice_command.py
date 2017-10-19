@@ -97,17 +97,20 @@ class Turtle():
         
         print('{0} received command: {1}'.format(self.name,command))
        
-        if command == "GO TOP RIGHT":
+        if command == "TOP RIGHT":
             self.move_to_goal(TOP_RIGHT_CORNER)
         
-        elif command == "GO TOP LEFT":            
+        elif command == "TOP LEFT":            
             self.move_to_goal(TOP_LEFT_CORNER)
             
-        elif command == "GO BOTTOM LEFT":
+        elif command == "BOTTOM LEFT":
             self.move_to_goal(BOTTOM_LEFT_CORNER)
         
-        elif command == "GO TOP RIGHT":
+        elif command == "TOP RIGHT":
             self.move_to_goal(BOTTOM_RIGHT_CORNER)
+        
+        elif command == "CENTER":
+            self.move_to_goal(CENTER)
             
         else:
             #raise ValueError('I cannot understand the command!')
